@@ -5,5 +5,5 @@ class User
 
   field :name
 
-  field :phone, type: RussianPhone::Field, default_country: 7
+  field :phone, type: RussianPhone::Number, default_country: 7, allowed_codes: [495]
 end
