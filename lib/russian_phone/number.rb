@@ -10,6 +10,10 @@ module RussianPhone
       @number = number.to_s
     end
 
+    def inspect
+      [@country, @city, @number]
+    end
+
     def split(format, number)
       format.inject([]) do |result, size|
         result << number.slice!(0..size-1)
@@ -29,18 +33,25 @@ module RussianPhone
     end
 
     def full
-      "+#@country (#@city) #{format}"
+      if free?
+        "8-#@city-#{format.join('-')}"
+      else
+        "+#@country (#@city) #{format.join('-')}"
+      end
     end
+
+    alias_method(:to_s, :full)
+    # alias_method(:inspect, :full)
 
     def clean
       "#@country#@city#@number"
     end
 
     def cell?
-      Codes.cell_codes.include? @city
+      Codes.cell_codes.include?(@city)
     end
 
-    def free_call?
+    def free?
       @city == '800'
     end
 
@@ -49,9 +60,12 @@ module RussianPhone
         string.tr('^0-9', '')
       end
 
+      def _extract(string, local_digits, code_digits)
+        [string[-(local_digits + code_digits), code_digits], string[-local_digits,local_digits]]
+      end
+
       def extract(string, local_digits, code_digits)
-        clean_string = clean(string)
-        [clean_string[-(local_digits + code_digits), code_digits], clean(string)[-local_digits,local_digits]]
+        _extract(clean(string), local_digits, code_digits)
       end
 
       def country_code(string)
@@ -64,17 +78,58 @@ module RussianPhone
             default_city: nil
         }.merge(opts)
 
-        code_3_digit, phone_7_digit = extract(string, 7, 3)
-        if Codes.cell_codes.include?(code_3_digit) || Codes.ndcs_with_7_subscriber_digits.include?(code_3_digit)
+        opts[:default_country] = opts[:default_country].to_s unless opts[:default_country].nil?
+        opts[:default_city]    = opts[:default_city].to_s    unless opts[:default_city].nil?
+
+        if string.class.name == 'Array'
+          string = string.join('')
+        else
+          string = string.to_s
+        end
+
+        clean_string = clean(string)
+
+        if clean_string.length > 11
+          return nil
+        end
+
+        if clean_string.length < 10
+          if opts[:default_city].nil?
+            return nil
+          elsif clean_string.length > 7
+            # Телефон слишком длинный для телефона без кода города
+            return nil
+          else
+            if Codes.codes_for(clean_string.length).include? opts[:default_city]
+              return RussianPhone::Number.new(opts[:default_country], opts[:default_city], clean_string)
+            else
+              # Количество цифр в телефоне не соответствует количеству цифр местных номеров города
+              return nil
+            end
+          end
+        end
+
+        code_3_digit, phone_7_digit = _extract(clean_string, 7, 3)
+
+        if code_3_digit == '800'
           return RussianPhone::Number.new(opts[:default_country], code_3_digit, phone_7_digit)
         end
 
-        code_4_digit, phone_6_digit = extract(string, 6, 4)
+
+        if Codes.cell_codes.include?(code_3_digit)
+          return RussianPhone::Number.new(opts[:default_country], code_3_digit, phone_7_digit)
+        end
+
+        if Codes.ndcs_with_7_subscriber_digits.include?(code_3_digit)
+          return RussianPhone::Number.new(opts[:default_country], code_3_digit, phone_7_digit)
+        end
+
+        code_4_digit, phone_6_digit = _extract(clean_string, 6, 4)
         if Codes.ndcs_with_6_subscriber_digits.include? code_4_digit
           return RussianPhone::Number.new(opts[:default_country], code_4_digit, phone_6_digit)
         end
 
-        code_5_digit, phone_5_digit = extract(string, 5, 5)
+        code_5_digit, phone_5_digit = _extract(clean_string, 5, 5)
         if Codes.ndcs_with_5_subscriber_digits.include? code_5_digit
           return RussianPhone::Number.new(opts[:default_country], code_5_digit, phone_5_digit)
         end

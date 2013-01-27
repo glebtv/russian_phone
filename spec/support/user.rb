@@ -2,9 +2,8 @@
 
 class User
   include Mongoid::Document
-  include RussianPhone::Mongoid
 
   field :name
 
-  phone_field :phone
+  field :phone, default_country: 7
 end

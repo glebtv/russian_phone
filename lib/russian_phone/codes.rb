@@ -126,6 +126,16 @@ module RussianPhone
       def cell_codes
         %w(901 902 903 904 905 906 908 909 910 911 912 913 914 915 916 917 918 919 920 921 922 923 924 925 926 927 928 929 930 931 932 933 934 936 937 938 950 951 952 953 960 961 962 963 964 965 967 980 981 982 983 984 985 987 988 989 997)
       end
+
+      def codes_for(digits)
+        if digits == 7
+          ndcs_with_7_subscriber_digits + cell_codes
+        elsif digits == 6
+          ndcs_with_6_subscriber_digits
+        elsif digits == 5
+          ndcs_with_5_subscriber_digits
+        end
+      end
     end
   end
 end

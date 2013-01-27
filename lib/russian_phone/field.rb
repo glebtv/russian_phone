@@ -1,28 +1,45 @@
 # coding: utf-8
 
 module RussianPhone
-  module Field
+  class Field
     attr_accessor :phone
 
-    def initialize(phone, default_country = nil, default_city = nil)
-      @phone = RussianPhone::Number.parse(phone, default_country, default_city)
+    def initialize(phone, opts = {})
+      p opts
+      p self
+      @phone = RussianPhone::Number.parse(phone, opts)
     end
+
+    ::Mongoid::Fields.option :allowed_codes do |model, field, value|
+      #p model, field, value
+      #model.send(field).allowed_codes = value
+    end
+    ::Mongoid::Fields.option :default_country do |model, field, value|
+      # model.send(field).default_country = value
+    end
+    ::Mongoid::Fields.option :default_city do |model, field, value|
+      # model.send(field).default_city = value
+    end
+
 
     # Converts an object of this instance into a database friendly value.
     def mongoize
-      @phone
+      @phone.to_s
     end
 
-    private
-      def method_missing(method, *args, &block)
-        @phone.send(method, *args, &block)
+    [:to_s, :free?, :cell?, :clean, :full, :inspect].each do |m|
+      define_method(m) do
+        @phone.send(m)
       end
+    end
 
     class << self
 
       # Get the object as it was stored in the database, and instantiate
       # this custom class from it.
       def demongoize(object)
+        p self.fields
+
         RussianPhone::Number.parse(object)
       end
 
@@ -31,7 +48,7 @@ module RussianPhone
       def mongoize(object)
         case object
           when RussianPhone then object.mongoize
-          when Hash then RussianPhone.new(object).mongoize
+          when String then RussianPhone::Number.parse(object).mongoize
           else object
         end
       end
