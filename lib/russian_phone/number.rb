@@ -15,13 +15,19 @@ module RussianPhone
 
     def ==(other)
       if other.class == self.class
-        other.phone == self.phone && other.options == self.options
+        # (other.phone == self.phone && other.options == self.options)
+        other.to_s == to_s
       elsif other.class == String
         parsed = RussianPhone::Number.new(other)
-        parsed.phone == self.phone && parsed.options == self.options
+        parsed.to_s == to_s
+        # parsed.phone == self.phone && parsed.options == self.options
       else
         false
       end
+    end
+
+    def coerce(something)
+      [self, something]
     end
 
     def parse(field)
@@ -105,49 +111,11 @@ module RussianPhone
       city == '800'
     end
 
-    ::Mongoid::Fields.option :allowed_cities do |model, field, value|
-      p model, field, value
-      User.send(field.name).options[:allowed_cities] = value
-      #model.send(field).allowed_cities = value
-    end
-    ::Mongoid::Fields.option :default_country do |model, field, value|
-      User.send(field.name).options[:default_country] = value
-    end
-    ::Mongoid::Fields.option :default_city do |model, field, value|
-      User.send(field.name).options[:default_city] = value
-    end
-
     def mongoize
       valid? ? full : @phone
     end
 
     class << self
-      # Get the object as it was stored in the database, and instantiate
-      # this custom class from it.
-      def demongoize(object)
-        # p "demongoize", object, object.class.name, object.inspect
-        RussianPhone::Number.new(object)
-      end
-
-      # Takes any possible object and converts it to how it would be
-      # stored in the database.
-      def mongoize(object)
-        case object
-          when RussianPhone then object.mongoize
-          when String then RussianPhone::Number.new(object).mongoize
-          else object
-        end
-      end
-
-      # Converts the object that was supplied to a criteria and converts it
-      # into a database friendly form.
-      def evolve(object)
-        case object
-          when RussianPhone then object.mongoize
-          else object
-        end
-      end
-
       def clean(string)
         string.tr('^0-9', '')
       end
@@ -173,7 +141,7 @@ module RussianPhone
 
         opts[:default_country] = opts[:default_country].to_s unless opts[:default_country].nil?
         opts[:default_city]    = opts[:default_city].to_s    unless opts[:default_city].nil?
-        opts[:allowed_cities]  = opts[:allowed_cities].map { |c| c.to_s } unless opts[:default_city].nil?
+        opts[:allowed_cities]  = opts[:allowed_cities].map { |c| c.to_s } unless opts[:allowed_cities].nil?
 
         opts
       end

@@ -249,6 +249,37 @@ describe RussianPhone do
       u.phone.city.should eq '906'
       u.phone.subscriber.should eq '1111111'
     end
+
+    it 'should respect field options' do
+      u = User.create(name: 'test', phone_in_495: '111 11 11', phone_in_812: '222 2222')
+      u.save.should be_true
+
+      u = User.first
+
+      u.phone_in_495.class.name.should eq 'RussianPhone::Number'
+      u.phone_in_495.should eq '+7 (495) 111-11-11'
+      u.phone_in_495.cell?.should be_false
+      u.phone_in_495.free?.should be_false
+
+      u.phone_in_495.country.should eq '7'
+      u.phone_in_495.city.should eq '495'
+      u.phone_in_495.subscriber.should eq '1111111'
+
+      u.phone_in_495.clean.should eq '74951111111'
+      u.phone_in_495.full.should eq '+7 (495) 111-11-11'
+
+      u.phone_in_812.class.name.should eq 'RussianPhone::Number'
+      u.phone_in_812.should eq '+7 (812) 222-22-22'
+      u.phone_in_812.cell?.should be_false
+      u.phone_in_812.free?.should be_false
+
+      u.phone_in_812.country.should eq '7'
+      u.phone_in_812.city.should eq '812'
+      u.phone_in_812.subscriber.should eq '2222222'
+
+      u.phone_in_812.clean.should eq '78122222222'
+      u.phone_in_812.full.should eq '+7 (812) 222-22-22'
+    end
   end
 
 end
