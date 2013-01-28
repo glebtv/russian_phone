@@ -19,126 +19,135 @@ describe RussianPhone do
 
   describe 'when parsing' do
     it 'should parse 8-800-111-11-11 number' do
-      phone = RussianPhone::Number.parse('8-800-111-11-11', default_country: 7)
+      phone = RussianPhone::Number.new('8-800-111-11-11', default_country: 7)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_true
 
       phone.city.should eq '800'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '8-800-111-11-11'
     end
 
     it 'should parse (906) 111-11-11 number' do
-      phone = RussianPhone::Number.parse('(906) 111-11-11', default_country: 7)
+      phone = RussianPhone::Number.new('(906) 111-11-11', default_country: 7)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_true
       phone.free?.should be_false
 
       phone.city.should eq '906'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '+7 (906) 111-11-11'
     end
 
     it 'should parse 111-11-11 number with default city' do
-      phone = RussianPhone::Number.parse('111-11-11', default_country: 7, default_city: 495)
+      phone = RussianPhone::Number.new('111-11-11', default_country: 7, default_city: 495)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '495'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '+7 (495) 111-11-11'
     end
 
     it 'should not parse 111-11-11 number without default city' do
-      phone = RussianPhone::Number.parse('111-11-11', default_country: 7)
-      phone.should be_nil
+      phone = RussianPhone::Number.new('111-11-11', default_country: 7)
+      phone.valid?.should be_false
     end
 
     it 'should parse 1111111 number with default city' do
-      phone = RussianPhone::Number.parse('1111111', default_country: 7, default_city: 495)
+      phone = RussianPhone::Number.new('1111111', default_country: 7, default_city: 495)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '495'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '+7 (495) 111-11-11'
     end
 
     it 'should parse +7 (495) 111-11-11 number' do
-      phone = RussianPhone::Number.parse('+7 (495) 111-11-11')
+      phone = RussianPhone::Number.new('+7 (495) 111-11-11')
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '495'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '+7 (495) 111-11-11'
     end
 
     it 'should parse +7 (495) 111-11-11 number' do
-      phone = RussianPhone::Number.parse('+7 (495) 111-11-11')
+      phone = RussianPhone::Number.new('+7 (495) 111-11-11')
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '495'
       phone.country.should eq '7'
-      phone.number.should eq '1111111'
+      phone.subscriber.should eq '1111111'
       phone.full.should eq '+7 (495) 111-11-11'
     end
 
     it 'should parse  8(4912)12-34-56 number' do
-      phone = RussianPhone::Number.parse('+7 (4912) 12-34-56', default_country: 7)
+      phone = RussianPhone::Number.new('+7 (4912) 12-34-56', default_country: 7)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '4912'
       phone.country.should eq '7'
-      phone.number.should eq '123456'
+      phone.subscriber.should eq '123456'
       phone.full.should eq '+7 (4912) 12-34-56'
     end
 
     it 'should parse  12-34-56 number whith default city' do
-      phone = RussianPhone::Number.parse('12-34-56', default_country: 7, default_city: 4912)
+      phone = RussianPhone::Number.new('12-34-56', default_country: 7, default_city: 4912)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '4912'
       phone.country.should eq '7'
-      phone.number.should eq '123456'
+      phone.subscriber.should eq '123456'
       phone.full.should eq '+7 (4912) 12-34-56'
     end
 
     it 'should parse 8(34356)5-67-89 number correctly' do
       # это номер в Екатеринбурге, с неправильно указанным кодом города
 
-      phone = RussianPhone::Number.parse('8(34356)5-67-89', default_country: 7)
+      phone = RussianPhone::Number.new('8(34356)5-67-89', default_country: 7)
       phone.should_not be_nil
+      phone.valid?.should be_true
 
       phone.cell?.should be_false
       phone.free?.should be_false
 
       phone.city.should eq '343'
       phone.country.should eq '7'
-      phone.number.should eq '5656789'
+      phone.subscriber.should eq '5656789'
       phone.full.should eq '+7 (343) 565-67-89'
     end
 
@@ -182,8 +191,9 @@ describe RussianPhone do
 
     tests.each_pair do |str, result|
       it "should parse #{str}" do
-        phone = RussianPhone::Number.parse(str, default_country: 7)
+        phone = RussianPhone::Number.new(str, default_country: 7)
         phone.should_not be_nil
+        phone.valid?.should be_true
 
         if %w(927 926).include? result[1].to_s
           phone.cell?.should be_true
@@ -195,7 +205,7 @@ describe RussianPhone do
 
         phone.country.should eq result[0].to_s
         phone.city.should eq result[1].to_s
-        phone.number.should eq result[2].to_s
+        phone.subscriber.should eq result[2].to_s
         phone.clean.should eq "#{result[0]}#{result[1]}#{result[2]}"
       end
     end
@@ -210,15 +220,16 @@ describe RussianPhone do
 
     bad_phones.each do |phone|
       it "should not parse #{phone}" do
-        phone = RussianPhone::Number.parse(phone, default_country: 7)
-        phone.should be_nil
+        phone = RussianPhone::Number.new(phone, default_country: 7)
+        phone.valid?.should be_false
       end
     end
   end
 
   describe 'when using ::Field' do
     it 'should serialize and deserialize correctly' do
-      RussianPhone::Field.new('495 111 11 11').mongoize.should eq '+7 (495) 111-11-11'
+      RussianPhone::Number.new('495 111 11 11').mongoize.should eq '+7 (495) 111-11-11'
+      RussianPhone::Number.demongoize('+7 (495) 111-11-11').mongoize.should eq '+7 (495) 111-11-11'
     end
   end
 
@@ -227,7 +238,7 @@ describe RussianPhone do
       u = User.create(name: 'test', phone: '906 111 11 11')
       u.save.should be_true
       u = User.first
-      p u
+      # p u
       u.phone.should eq '+7 (906) 111-11-11'
       u.phone.cell?.should be_true
       u.phone.free?.should be_false
@@ -236,7 +247,7 @@ describe RussianPhone do
 
       u.phone.country.should eq '7'
       u.phone.city.should eq '906'
-      u.phone.number.should eq '1111111'
+      u.phone.subscriber.should eq '1111111'
     end
   end
 
