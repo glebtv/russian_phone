@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["glebtv@gmail.com"]
   gem.description   = %q{Russian Phone Numbers for Mongoid}
   gem.summary       = %q{Поле для хранения Российских телефонных номеров в Mongoid}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/glebtv/russian_phone"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

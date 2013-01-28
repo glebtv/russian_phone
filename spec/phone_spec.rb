@@ -238,7 +238,7 @@ describe RussianPhone do
       u = User.new(name: 'test', phone: '906 111 11 11')
       u.save.should be_true
       u = User.first
-      
+
       u.phone.should eq '+7 (906) 111-11-11'
       u.phone.cell?.should be_true
       u.phone.free?.should be_false
