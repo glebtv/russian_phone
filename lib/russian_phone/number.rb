@@ -9,10 +9,6 @@ module RussianPhone
       @phone = phone.to_s
     end
 
-    def inspect
-      '"' + full + '"'
-    end
-
     def ==(other)
       if other.class == self.class
         # (other.phone == self.phone && other.options == self.options)
@@ -96,9 +92,6 @@ module RussianPhone
       end
     end
 
-    alias_method(:to_s, :full)
-    # alias_method(:inspect, :full)
-
     def clean
       "#{country}#{city}#{subscriber}"
     end
@@ -111,9 +104,23 @@ module RussianPhone
       city == '800'
     end
 
-    def mongoize
+    # alias_method(:to_s, :full)
+    # alias_method(:inspect, :full)
+
+    def to_s
       valid? ? full : @phone
     end
+
+
+    def inspect
+      # '"' + full + '"'
+      '"' + to_s + '"'
+    end
+
+    #def mongoize
+    #  valid? ? full : @phone
+    #end
+    alias_method(:mongoize, :to_s)
 
     class << self
       def clean(string)

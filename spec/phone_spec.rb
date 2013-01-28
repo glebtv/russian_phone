@@ -235,10 +235,10 @@ describe RussianPhone do
 
   describe 'when storing with mongoid' do
     it 'should parse, store and retrieve numbers correctly' do
-      u = User.create(name: 'test', phone: '906 111 11 11')
+      u = User.new(name: 'test', phone: '906 111 11 11')
       u.save.should be_true
       u = User.first
-      # p u
+      
       u.phone.should eq '+7 (906) 111-11-11'
       u.phone.cell?.should be_true
       u.phone.free?.should be_false
@@ -279,6 +279,47 @@ describe RussianPhone do
 
       u.phone_in_812.clean.should eq '78122222222'
       u.phone_in_812.full.should eq '+7 (812) 222-22-22'
+    end
+
+    it 'should fail validation when validate is on and phone is invalid' do
+      u = UserWithValidation.new(phone: '123')
+      u.valid?.should be_false
+      u.save.should be_false
+      u.errors.messages.should eq({:phone =>["Неверный телефонный номер"]})
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+    end
+
+    it 'should fail validation when validate is on and city is not in allowed_cities' do
+      u = UserWithValidation.new(phone: '906 121 11 11')
+      u.valid?.should be_false
+      u.save.should be_false
+      u.errors.messages.should eq({:phone =>["Неверный телефонный номер"]})
+    end
+
+    it 'should pass validation when validate is off and phone is invalid' do
+      u = UserWithoutValidation.new(phone: '123')
+
+      u.valid?.should be_true
+      u.save.should be_true
+    end
+
+    it 'should pass validation when validate is off and phone is valid' do
+      u = UserWithoutValidation.new(phone: '495 121 11 11')
+
+      u.valid?.should be_true
+      u.save.should be_true
+    end
+
+    it 'should pass validation when validate is off and city is not in allowed_cities' do
+      u = UserWithoutValidation.new(phone: '906 121 11 11')
+
+      u.valid?.should be_true
+      u.save.should be_true
     end
   end
 

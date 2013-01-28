@@ -6,6 +6,7 @@ module RussianPhone
   autoload :Field,        'russian_phone/field'
   autoload :Number,       'russian_phone/number'
   autoload :Codes,        'russian_phone/codes'
+  autoload :Validator,    'russian_phone/validator'
 
   def self.field(options = {})
     RussianPhone::Field.new(options)

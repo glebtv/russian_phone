@@ -8,6 +8,12 @@ module RussianPhone
       @options = Number.process_options(options)
     end
 
+    ::Mongoid::Fields.option :validate do |model, field, value|
+      if value
+        model.validates_with RussianPhone::Validator, fields: [field.name]
+      end
+    end
+
     # Get the object as it was stored in the database, and instantiate
     # this custom class from it.
     def demongoize(object)
