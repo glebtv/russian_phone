@@ -4,8 +4,6 @@
 
 Гем для разбора и нормализации русских телефонных номеров
 
-## Внимание: гем находится в разработке и пока не готов для использования
-
 ## Альтернативные решения
 
 https://github.com/floere/phony
@@ -35,6 +33,7 @@ Or install it yourself as:
 ## Usage
 
 Использованиие для разбора телефонных номеров:
+
     # phone = RussianPhone::Number.new('(906) 111-11-11', default_country: 7)
     => "+7 (906) 111-11-11"
     # phone.country
@@ -53,6 +52,7 @@ Or install it yourself as:
     => true
 
 Использование с Mongoid:
+
     class User
         include Mongoid::Document
         field :phone, type: RussianPhone.field(default_country: 7, allowed_cities: [495]), validate: true
