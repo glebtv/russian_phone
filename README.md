@@ -34,7 +34,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Использованиие для разбора телефонных номеров:
+    # phone = RussianPhone::Number.new('(906) 111-11-11', default_country: 7)
+    => "+7 (906) 111-11-11"
+    # phone.country
+    => "7"
+    # phone.city
+    => "906"
+    # phone.subscriber
+    => "1111111"
+    # phone.full
+    => "+7 (906) 111-11-11"
+    # phone.cell?
+    => true
+    # phone.free?
+    => false
+    # phone.valid?
+    => true
+
+Использование с Mongoid:
+    class User
+        include Mongoid::Document
+        field :phone, type: RussianPhone.field(default_country: 7, allowed_cities: [495]), validate: true
+    end
+
+    # u = User.new(phone: '495 1111111')
+    # u.phone
+    => '+7 (495) 111-11-11'
+    # u.phone.valid?
+    => true
+    
+Обратите внимание, по умолчанию *валидация телефонного номера выключена*, это значит что номер будет
+сохраняться в базу даже если гем не смог его разобрать. Включите валидацию, установив validate:true.
+
+В базе телефоны храняться в виде строки в полном виде, если телефон удалось разобрать, и в том виде как
+введено пользователем, если не удалось разобрать и validate == false
 
 ## Contributing
 
