@@ -226,6 +226,19 @@ module RussianPhone
           extra_after += 1
         end
 
+        # handles stuff like 89061010101 д. 123
+        if string.split(' ').length > 1 && string.split(/\D/)[0].length > 10
+          if string.starts_with?('7')
+            clean_string[0] = ''
+            extra_after += 1
+          end
+
+          if string.starts_with?('8')
+            clean_string[0] = ''
+            extra_after += 1
+          end
+        end
+
         code_3_digit, phone_7_digit = _extract(clean_string, 7, 3)
         if code_3_digit == '800' || Codes.cell_codes.include?(code_3_digit) || Codes.ndcs_with_7_subscriber_digits.include?(code_3_digit)
           return {country: opts[:default_country], city: code_3_digit, subscriber: phone_7_digit, extra: _extra(string, extra_after)}

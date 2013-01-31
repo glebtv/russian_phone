@@ -179,6 +179,34 @@ describe RussianPhone do
       phone.full.should eq '+7 (906) 111-11-11 д. 123'
     end
 
+    it 'should handle phones with extra stuff [89061010101 д. 123]' do
+      phone = RussianPhone::Number.new('89061010101 д. 123', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_true
+      phone.free?.should be_false
+
+      phone.city.should eq '906'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1010101'
+      phone.full.should eq '+7 (906) 101-01-01 д. 123'
+    end
+
+    it 'should handle phones with extra stuff [89061010101-д. 123]' do
+      phone = RussianPhone::Number.new('89061010101-д. 123', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_true
+      phone.free?.should be_false
+
+      phone.city.should eq '906'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1010101'
+      phone.full.should eq '+7 (906) 101-01-01 -д. 123'
+    end
+
     it 'should handle phones with unknown codes [8 (533) 111-11-11]' do
       phone = RussianPhone::Number.new('8 (533) 111-11-11', default_country: 7)
       phone.should_not be_nil
@@ -229,6 +257,8 @@ describe RussianPhone do
         '7 (927) 12 342 34' => [7, 927, 1234234],
         '7-(927)-12-342-34' => [7, 927, 1234234],
         '7 84543 123 12' => [7, 84543, 12312],
+        '78454312312' => [7, 84543, 12312],
+        '88454312312' => [7, 84543, 12312],
     }
 
     tests.each_pair do |str, result|
