@@ -151,6 +151,48 @@ describe RussianPhone do
       phone.full.should eq '+7 (343) 565-67-89'
     end
 
+    it 'should handle phones with extra stuff [8 (906) 111-11-11 доб. 123]' do
+      phone = RussianPhone::Number.new('8 (906) 111-11-11 доб. 123', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_true
+      phone.free?.should be_false
+
+      phone.city.should eq '906'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1111111'
+      phone.full.should eq '+7 (906) 111-11-11 доб. 123'
+    end
+
+    it 'should handle phones with extra stuff [8 (906) 111-11-11 д. 123]' do
+      phone = RussianPhone::Number.new('8 (906) 111-11-11 д. 123', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_true
+      phone.free?.should be_false
+
+      phone.city.should eq '906'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1111111'
+      phone.full.should eq '+7 (906) 111-11-11 д. 123'
+    end
+
+    it 'should handle phones with unknown codes [8 (533) 111-11-11]' do
+      phone = RussianPhone::Number.new('8 (533) 111-11-11', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_false
+      phone.free?.should be_false
+
+      phone.city.should eq '533'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1111111'
+      phone.full.should eq '+7 (533) 111-11-11'
+    end
+
     tests = {
         '+79261234567' => [7, 926, 1234567],
         '89261234567' => [7, 926, 1234567],
@@ -212,10 +254,10 @@ describe RussianPhone do
 
     bad_phones = [
         '123 123',
-        '11 11 11 11 11 11 11',
+        '000000',
         '123',
         'пыщ пыщ ололо я водитель НЛО',
-        '11 11 11 11 1'
+        '11 1 11 1'
     ]
 
     bad_phones.each do |phone|
@@ -228,7 +270,8 @@ describe RussianPhone do
 
   describe 'when using ::Field' do
     it 'should serialize and deserialize correctly' do
-      RussianPhone::Number.new('495 111 11 11').mongoize.should eq '+7 (495) 111-11-11'
+      RussianPhone::Number.new('8 (906) 111-11-11 д. 123').mongoize.should eq '8 (906) 111-11-11 д. 123'
+      RussianPhone::Number.new('495 111 11 11').mongoize.should eq '495 111 11 11'
       RussianPhone::Number.demongoize('+7 (495) 111-11-11').mongoize.should eq '+7 (495) 111-11-11'
     end
   end

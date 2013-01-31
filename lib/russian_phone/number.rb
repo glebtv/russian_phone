@@ -34,6 +34,7 @@ module RussianPhone
         @subscriber = data[:subscriber].to_s
         @city = data[:city].to_s
         @country = data[:country].to_s
+        @extra = data[:extra].to_s
       end
 
       data.has_key?(field) ? data[field] : nil
@@ -59,6 +60,10 @@ module RussianPhone
       @country ||= parse(:country)
     end
 
+    def extra
+      @extra ||= parse(:extra)
+    end
+
     def split(format, number)
       number = number.dup
       format.inject([]) do |result, size|
@@ -82,10 +87,10 @@ module RussianPhone
 
     def full
       if valid?
-        if free?
+        if free? && extra == ''
         "8-#{city}-#{format.join('-')}"
         else
-        "+#{country} (#{city}) #{format.join('-')}"
+        "+#{country} (#{city}) #{format.join('-')}#{extra == '' ? '' : ' ' + extra}"
         end
       else
         ''
@@ -117,22 +122,44 @@ module RussianPhone
       '"' + to_s + '"'
     end
 
-    #def mongoize
-    #  valid? ? full : @phone
-    #end
-    alias_method(:mongoize, :to_s)
+    def mongoize
+      @phone
+    end
+    # alias_method(:mongoize, :to_s)
 
     class << self
       def clean(string)
         string.tr('^0-9', '')
       end
 
+      #def _extract(string, subscriber_digits, code_digits)
+      #  [string[-(subscriber_digits + code_digits), code_digits], string[-subscriber_digits,subscriber_digits]]
+      #end
+
       def _extract(string, subscriber_digits, code_digits)
-        [string[-(subscriber_digits + code_digits), code_digits], string[-subscriber_digits,subscriber_digits]]
+        [string[0, code_digits], string[code_digits, subscriber_digits]]
       end
 
       def extract(string, subscriber_digits, code_digits)
         _extract(clean(string), subscriber_digits, code_digits)
+      end
+
+      def _extra(string, position)
+        i = 0
+        digits = 0
+
+        string.each_char do |char|
+          if char.match(/[0-9]/)
+            digits += 1
+          end
+          i += 1
+          # puts "#{char} #{digits} #{i} #{position}"
+          if digits >= position
+            return string[i..-1].strip
+          end
+        end
+
+        ''
       end
 
       def country_code(string)
@@ -166,10 +193,6 @@ module RussianPhone
 
         clean_string = clean(string)
 
-        if clean_string.length > 11
-          return nil
-        end
-
         if clean_string.length < 10
           if opts[:default_city].nil?
             return nil
@@ -186,22 +209,39 @@ module RussianPhone
           end
         end
 
+        extra_after = 10
+
+        if clean_string.length > 10 && string.starts_with?('+7') || string.starts_with?('8 ') || string.starts_with?('8(') || string.starts_with?('8-')
+          clean_string[0] = ''
+          extra_after += 1
+        end
+
+        if clean_string.length == 11 && string.starts_with?('7')
+          clean_string[0] = ''
+          extra_after += 1
+        end
+
+        if clean_string.length == 11 && string.starts_with?('8')
+          clean_string[0] = ''
+          extra_after += 1
+        end
+
         code_3_digit, phone_7_digit = _extract(clean_string, 7, 3)
         if code_3_digit == '800' || Codes.cell_codes.include?(code_3_digit) || Codes.ndcs_with_7_subscriber_digits.include?(code_3_digit)
-          return {country: opts[:default_country], city: code_3_digit, subscriber: phone_7_digit}
+          return {country: opts[:default_country], city: code_3_digit, subscriber: phone_7_digit, extra: _extra(string, extra_after)}
         end
 
         code_4_digit, phone_6_digit = _extract(clean_string, 6, 4)
         if Codes.ndcs_with_6_subscriber_digits.include? code_4_digit
-          return {country: opts[:default_country], city: code_4_digit, subscriber: phone_6_digit}
+          return {country: opts[:default_country], city: code_4_digit, subscriber: phone_6_digit, extra: _extra(string, extra_after)}
         end
 
         code_5_digit, phone_5_digit = _extract(clean_string, 5, 5)
         if Codes.ndcs_with_5_subscriber_digits.include? code_5_digit
-          return {country: opts[:default_country], city: code_5_digit, subscriber: phone_5_digit}
+          return {country: opts[:default_country], city: code_5_digit, subscriber: phone_5_digit, extra: _extra(string, extra_after)}
         end
 
-        nil
+        return {country: opts[:default_country], city: code_3_digit, subscriber: phone_7_digit, extra: _extra(string, extra_after)}
       end
     end
   end
