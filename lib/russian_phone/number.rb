@@ -242,6 +242,19 @@ module RussianPhone
           end
         end
 
+        # handle 7906123-12-12 доб 123
+        if clean_string.length > 10 && extra_after == 10 && (clean_string[0] == '7' || clean_string[0] == '8')
+          result = ''
+          string.split(/\D/).each do |segm|
+            result += segm
+            break if result.length >= 10
+          end
+          if result.length > 10
+            clean_string[0] = ''
+            extra_after += 1
+          end
+        end
+
         code_3_digit, phone_7_digit = _extract(clean_string, 7, 3)
         if code_3_digit == '800' || Codes.cell_codes.include?(code_3_digit) || Codes.ndcs_with_7_subscriber_digits.include?(code_3_digit)
           return {country: opts[:default_country], city: code_3_digit, subscriber: phone_7_digit, extra: _extra(string, extra_after)}

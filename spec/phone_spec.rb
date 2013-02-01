@@ -428,6 +428,32 @@ describe RussianPhone do
       UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
       UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
     end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '7495123-12-12 доб 123')
+
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 123-12-12 доб 123'
+      UserWithValidation.first.phone.should eq '+7 (495) 123-12-12 доб 123'
+    end
+
+    it 'should pass validation when phone is valid (unknown city code)' do
+      u = UserWithAnyCode.new(phone: '7701123-12-12 доб 123')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithAnyCode.first.read_attribute(:phone).should eq '+7 (701) 123-12-12 доб 123'
+      UserWithAnyCode.first.phone.should eq '+7 (701) 123-12-12 доб 123'
+    end
+
+    it 'should pass validation when validate is on and phone is valid (unknown city code)' do
+      u = UserWithAnyCode.new(phone: '701123-12-12 доб 123')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithAnyCode.first.read_attribute(:phone).should eq '+7 (701) 123-12-12 доб 123'
+      UserWithAnyCode.first.phone.should eq '+7 (701) 123-12-12 доб 123'
+    end
+
     it 'should pass validation when validate is on and phone is valid' do
       u = UserWithValidation.new(phone: '8 495 121 11 11')
       u.valid?.should be_true
