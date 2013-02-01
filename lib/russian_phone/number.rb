@@ -125,6 +125,8 @@ module RussianPhone
     def mongoize
       @phone
     end
+    alias_method(:as_json, :mongoize)
+
     # alias_method(:mongoize, :to_s)
 
     class << self
