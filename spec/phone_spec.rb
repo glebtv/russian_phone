@@ -121,7 +121,21 @@ describe RussianPhone do
       phone.full.should eq '+7 (4912) 12-34-56'
     end
 
-    it 'should parse  12-34-56 number whith default city' do
+    it 'should parse 2-34-56 number whith default city' do
+      phone = RussianPhone::Number.new('2-34-56', default_country: 7, default_city: 87252)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_false
+      phone.free?.should be_false
+
+      phone.city.should eq '87252'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '23456'
+      phone.full.should eq '+7 (87252) 2-34-56'
+    end
+
+    it 'should parse 12-34-56 number whith default city' do
       phone = RussianPhone::Number.new('12-34-56', default_country: 7, default_city: 4912)
       phone.should_not be_nil
       phone.valid?.should be_true
@@ -149,6 +163,22 @@ describe RussianPhone do
       phone.country.should eq '7'
       phone.subscriber.should eq '5656789'
       phone.full.should eq '+7 (343) 565-67-89'
+    end
+
+    it 'should parse  7 (906) 123-45-67 number correctly' do
+      # это номер в Екатеринбурге, с неправильно указанным кодом города
+
+      phone = RussianPhone::Number.new('7 (906) 123-45-67', default_country: 7)
+      phone.should_not be_nil
+      phone.valid?.should be_true
+
+      phone.cell?.should be_true
+      phone.free?.should be_false
+      phone.extra.should eq ''
+      phone.city.should eq '906'
+      phone.country.should eq '7'
+      phone.subscriber.should eq '1234567'
+      phone.full.should eq '+7 (906) 123-45-67'
     end
 
     it 'should handle phones with extra stuff [8 (906) 111-11-11 доб. 123]' do
@@ -300,9 +330,15 @@ describe RussianPhone do
 
   describe 'when using ::Field' do
     it 'should serialize and deserialize correctly' do
-      RussianPhone::Number.new('8 (906) 111-11-11 д. 123').mongoize.should eq '8 (906) 111-11-11 д. 123'
-      RussianPhone::Number.new('495 111 11 11').mongoize.should eq '495 111 11 11'
+      RussianPhone::Number.new('8 (906) 111-11-11 д. 123').mongoize.should eq '+7 (906) 111-11-11 д. 123'
+
+      RussianPhone::Number.new('495 111 11 11').mongoize.should eq '+7 (495) 111-11-11'
+
       RussianPhone::Number.demongoize('+7 (495) 111-11-11').mongoize.should eq '+7 (495) 111-11-11'
+
+      RussianPhone::Field.mongoize(RussianPhone::Number.new('495 111 11 11')).should eq '+7 (495) 111-11-11'
+      RussianPhone::Field.evolve(RussianPhone::Number.new('495 111 11 11')).should eq '+7 (495) 111-11-11'
+      RussianPhone::Field.evolve(RussianPhone::Number.new('495 111 11 11 доб 123')).should eq '+7 (495) 111-11-11 доб 123'
     end
   end
 
@@ -365,6 +401,55 @@ describe RussianPhone do
       u = UserWithValidation.new(phone: '495 121 11 11')
       u.valid?.should be_true
       u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '7495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '7 495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '8495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '8 495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '+7 495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = UserWithValidation.new(phone: '495 121 11 11 доб 123')
+      u.valid?.should be_true
+      u.save.should be_true
+      UserWithValidation.first.read_attribute(:phone).should eq '+7 (495) 121-11-11 доб 123'
+      UserWithValidation.first.phone.should eq '+7 (495) 121-11-11 доб 123'
     end
 
     it 'should fail validation when validate is on and city is not in allowed_cities' do

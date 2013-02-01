@@ -10,7 +10,7 @@ module RussianPhone
 
     ::Mongoid::Fields.option :validate do |model, field, value|
       if value
-        model.validates_with RussianPhone::Validator, fields: [field.name]
+        model.validates_with(RussianPhone::Validator, fields: [field.name])
       end
     end
 
