@@ -44,6 +44,14 @@ module RussianPhone
       @valid ||= !(country.nil? || city.nil? || subscriber.nil? || country == '' || city == ''  || subscriber == '')
     end
 
+    def blank?
+      @phone.strip == ''
+    end
+
+    def empty?
+      @phone.strip == ''
+    end
+
     def subscriber
       @subscriber ||= parse(:subscriber)
     end
