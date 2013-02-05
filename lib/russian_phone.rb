@@ -3,10 +3,11 @@
 require "russian_phone/version"
 
 module RussianPhone
-  autoload :Field,        'russian_phone/field'
-  autoload :Number,       'russian_phone/number'
-  autoload :Codes,        'russian_phone/codes'
-  autoload :Validator,    'russian_phone/validator'
+  autoload :Field,             'russian_phone/field'
+  autoload :Number,            'russian_phone/number'
+  autoload :Codes,             'russian_phone/codes'
+  autoload :PresenceValidator, 'russian_phone/presence_validator'
+  autoload :FormatValidator,   'russian_phone/format_validator'
 
   def self.field(options = {})
     RussianPhone::Field.new(options)

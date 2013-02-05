@@ -505,6 +505,30 @@ describe RussianPhone do
       u.valid?.should be_true
       u.save.should be_true
     end
+
+    it 'should pass validation when required but not validated' do
+      u = UserWithRequired.new(phone: '906 121 11 11')
+
+      u.valid?.should be_true
+      u.save.should be_true
+    end
+
+    it 'should pass validation when required but not validated' do
+      u = UserWithRequired.new(phone: '11 11')
+
+      u.valid?.should be_true
+      u.save.should be_true
+    end
+
+    it 'should fail validation when required and not present' do
+      u = UserWithRequired.new()
+      u.valid?.should be_false
+      u.save.should be_false
+
+      u = UserWithRequired.new(phone: '')
+      u.valid?.should be_false
+      u.save.should be_false
+    end
   end
 
 end

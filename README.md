@@ -58,8 +58,7 @@ Or install it yourself as:
 
     class User
         include Mongoid::Document
-        field :phone, type: RussianPhone.field(default_country: 7, allowed_cities: [495]), validate: true
-        validates_presence_of :phone
+        field :phone, type: RussianPhone.field(default_country: 7, allowed_cities: [495]), validate: true, required: true
     end
 
     # u = User.new(phone: '495 1111111')
@@ -67,8 +66,6 @@ Or install it yourself as:
     => '+7 (495) 111-11-11'
     # u.phone.valid?
     => true
-
-Валидация не проверяет наличия телефона, проверяйте это отдельно!
 
 Обратите внимание, по умолчанию *валидация телефонного номера выключена*, это значит что номер будет
 сохраняться в базу даже если гем не смог его разобрать. Включите валидацию, установив validate:true.
