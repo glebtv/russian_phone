@@ -63,6 +63,7 @@ module RussianPhone
     def city
       @city ||= parse(:city)
     end
+    alias_method :area, :city
 
     def country
       @country ||= parse(:country)
@@ -92,17 +93,21 @@ module RussianPhone
         []
       end
     end
-
+    
+    def formatted_area
+      area.nil? ? '' : "(#{area})"
+    end
+    
     def formatted_subscriber
-      format.join('-')
+      subscriber.nil? ? '' : format.join('-')
     end
     
     def full
       if valid?
         if free? && extra == ''
-        "8-#{city}-#{formatted_subscriber}"
+        "8-#{area}-#{formatted_subscriber}"
         else
-        "+#{country} (#{city}) #{formatted_subscriber}#{extra == '' ? '' : ' ' + extra}"
+        "+#{country} #{formatted_area} #{formatted_subscriber}#{extra == '' ? '' : ' ' + extra}"
         end
       else
         ''
@@ -110,15 +115,15 @@ module RussianPhone
     end
 
     def clean
-      "#{country}#{city}#{subscriber}"
+      "#{country}#{area}#{subscriber}"
     end
 
     def cell?
-      Codes.cell_codes.include?(city)
+      Codes.cell_codes.include?(area)
     end
 
     def free?
-      city == '800'
+      area == '800'
     end
 
     # alias_method(:to_s, :full)
