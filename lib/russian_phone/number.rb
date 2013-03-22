@@ -93,12 +93,16 @@ module RussianPhone
       end
     end
 
+    def formatted_subscriber
+      format.join('-')
+    end
+    
     def full
       if valid?
         if free? && extra == ''
-        "8-#{city}-#{format.join('-')}"
+        "8-#{city}-#{formatted_subscriber}"
         else
-        "+#{country} (#{city}) #{format.join('-')}#{extra == '' ? '' : ' ' + extra}"
+        "+#{country} (#{city}) #{formatted_subscriber}#{extra == '' ? '' : ' ' + extra}"
         end
       else
         ''

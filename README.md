@@ -45,6 +45,8 @@ Or install it yourself as:
     => "906"
     # phone.subscriber
     => "1111111"
+    # phone.formatted_subscriber
+    => "111-11-11"
     # phone.full
     => "+7 (906) 111-11-11"
     # phone.cell?
