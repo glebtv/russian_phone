@@ -12,6 +12,8 @@ https://github.com/joost/phony_rails
 
 https://github.com/carr/phone
 
+https://github.com/sstephenson/global_phone
+
 Указанные решения поддерживают несколько стран
 
 russian_phone поддерживает и будет поддерживать только российские телефонные номера
