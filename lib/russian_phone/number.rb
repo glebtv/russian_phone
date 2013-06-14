@@ -139,12 +139,10 @@ module RussianPhone
       '"' + to_s + '"'
     end
 
-    #def mongoize
-    #  @phone
-    #end
-    # alias_method(:as_json, :mongoize)
+    def as_json(options = {})
+      to_s
+    end
 
-    alias_method(:as_json, :to_s)
     alias_method(:mongoize, :to_s)
 
     class << self
