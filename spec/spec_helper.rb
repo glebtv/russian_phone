@@ -16,16 +16,9 @@ require 'russian_phone'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
-def mongoid3?
-  defined?(Mongoid::VERSION) && Gem::Version.new(Mongoid::VERSION) >= Gem::Version.new('3.0.0')
-end
-
 Mongoid.configure do |config|
-  if mongoid3?
-    config.sessions[:default] = { :database => 'russian_phone_test', :hosts => ['localhost:27017'] }
-  else
-    config.master = Mongo::Connection.new.db('russian_phone_test')
-  end
+  ENV["MONGOID_ENV"] = "test"
+  Mongoid.load!("spec/support/mongoid.yml")
 end
 
 DatabaseCleaner.orm = "mongoid"

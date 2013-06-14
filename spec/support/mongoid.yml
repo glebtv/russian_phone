@@ -1,0 +1,8 @@
+test:
+  sessions:
+    default:
+      database: russian_phone
+      hosts:
+        - localhost:27017
+      options:
+        consistency: :strong
