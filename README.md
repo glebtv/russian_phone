@@ -51,6 +51,8 @@ Or install it yourself as:
     => "111-11-11"
     # phone.full
     => "+7 (906) 111-11-11"
+    # phone.clean
+    => "79061111111"
     # phone.cell?
     => true
     # phone.free?
