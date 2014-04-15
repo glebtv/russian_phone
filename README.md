@@ -1,5 +1,7 @@
 # RussianPhone
 
+[![Build Status](https://travis-ci.org/glebtv/russian_phone.svg?branch=master)](https://travis-ci.org/glebtv/russian_phone)
+
 ## Что это
 
 Гем для разбора и нормализации русских телефонных номеров
