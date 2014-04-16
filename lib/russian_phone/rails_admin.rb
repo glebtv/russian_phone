@@ -9,11 +9,11 @@ module RailsAdmin
     module Mongoid
       class Property
         alias_method :type_without_russian_phone, :type
-        def type(name, field)
-          if field.type.class.name == "RussianPhone::Field"
-            { :type => :string }
+        def type
+          if property.type.class.name == "RussianPhone::Field"
+            :string
           else
-            type_without_russian_phone(name, field)
+            type_without_russian_phone
           end
         end
       end

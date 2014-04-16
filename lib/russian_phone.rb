@@ -17,3 +17,4 @@ end
 if Object.const_defined?("RailsAdmin")
   require "russian_phone/rails_admin"
 end
+
