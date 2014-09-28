@@ -3,6 +3,7 @@
 require "russian_phone/version"
 
 module RussianPhone
+  autoload :ActiveRecord,      'russian_phone/active_record'
   autoload :Field,             'russian_phone/field'
   autoload :Number,            'russian_phone/number'
   autoload :Codes,             'russian_phone/codes'

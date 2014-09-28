@@ -18,11 +18,17 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
 
-  gem.add_runtime_dependency 'mongoid', '>= 3.0.0'
 
+  gem.add_development_dependency 'mongoid', '>= 3.0.0'
+  gem.add_development_dependency "rails", ">= 3.0"
+	gem.add_development_dependency "rspec", "~> 2.14.0"
+  gem.add_development_dependency 'sqlite3'
+  gem.add_development_dependency "rspec-rails", "~> 2.14"
+  gem.add_development_dependency 'activerecord'
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'simplecov'
+  gem.add_development_dependency 'pry'
   gem.add_development_dependency 'database_cleaner'
 end
+

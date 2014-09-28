@@ -75,6 +75,20 @@ Or install it yourself as:
     # u.phone.valid?
     => true
 
+Использование с ActiveRecord
+
+    class ArUser < ActiveRecord::Base
+      russian_phone :phone
+      russian_phone :validated_phone, default_country: 7, allowed_cities: [495], validate: true
+    end
+
+    # u = ArUser.new(phone: '495 1111111')
+    # u.phone
+    => '+7 (495) 111-11-11'
+    # u.phone.valid?
+    => true
+
+
 Обратите внимание, по умолчанию *валидация телефонного номера выключена*, это значит что номер будет
 сохраняться в базу даже если гем не смог его разобрать. Включите валидацию, установив validate:true.
 

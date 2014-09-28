@@ -342,6 +342,62 @@ describe RussianPhone do
     end
   end
 
+  describe 'when storing with activerecord' do
+    it 'should parse, store and retrieve numbers correctly' do
+      u = ArUser.new(name: 'test', phone: '906 111 11 11')
+      u.save.should be_true
+      u = ArUser.first
+      u.phone.should eq '+7 (906) 111-11-11'
+      u.phone.cell?.should be_true
+      u.phone.free?.should be_false
+
+      u.phone.clean.should eq '79061111111'
+
+      u.phone.country.should eq '7'
+      u.phone.city.should eq '906'
+      u.phone.subscriber.should eq '1111111'
+    end
+
+    it 'should fail validation when validate is on and phone is invalid' do
+      u = ArUser.new(validated_phone: '123')
+      u.valid?.should be_false
+      u.save.should be_false
+      u.errors.messages.should eq({:validated_phone =>["Неверный телефонный номер"]})
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = ArUser.new(validated_phone: '495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      ArUser.first.read_attribute(:validated_phone).should eq '+7 (495) 121-11-11'
+      ArUser.first.validated_phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = ArUser.new(validated_phone: '7495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      ArUser.first.read_attribute(:validated_phone).should eq '+7 (495) 121-11-11'
+      ArUser.first.validated_phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = ArUser.new(validated_phone: '7 495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      ArUser.first.read_attribute(:validated_phone).should eq '+7 (495) 121-11-11'
+      ArUser.first.validated_phone.should eq '+7 (495) 121-11-11'
+    end
+
+    it 'should pass validation when validate is on and phone is valid' do
+      u = ArUser.new(validated_phone: '8495 121 11 11')
+      u.valid?.should be_true
+      u.save.should be_true
+      ArUser.first.read_attribute(:validated_phone).should eq '+7 (495) 121-11-11'
+      ArUser.first.validated_phone.should eq '+7 (495) 121-11-11'
+    end
+  end
+
   describe 'when storing with mongoid' do
     it 'should parse, store and retrieve numbers correctly' do
       u = User.new(name: 'test', phone: '906 111 11 11')
