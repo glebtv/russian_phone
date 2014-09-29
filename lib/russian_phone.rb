@@ -19,3 +19,7 @@ if Object.const_defined?("RailsAdmin")
   require "russian_phone/rails_admin"
 end
 
+if Object.const_defined?("Rails")
+  require "russian_phone/railtie"
+end
+
