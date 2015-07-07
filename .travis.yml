@@ -7,5 +7,4 @@ notifications:
 language: ruby
 rvm:
   - 2.2.2
-  - jruby-20mode
 
