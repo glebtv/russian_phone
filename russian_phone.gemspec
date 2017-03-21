@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rspec-rails", "~> 2.14"
   gem.add_development_dependency 'activerecord'
   gem.add_development_dependency 'bundler'
-  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rake', '< 11.0'
   gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'pry'
   gem.add_development_dependency 'database_cleaner'
