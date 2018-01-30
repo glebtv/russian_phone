@@ -27,6 +27,11 @@ https://github.com/carr/phone
 
 https://github.com/sstephenson/global_phone
 
+https://github.com/wmoxam/phonie
+
+https://github.com/daddyz/phonelib
+
+
 Указанные решения поддерживают несколько стран
 
 russian_phone поддерживает и будет поддерживать только российские телефонные номера
